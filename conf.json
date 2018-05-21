@@ -1,0 +1,14 @@
+{
+    "Debug": "True",
+    "LogLocation": "./server.log",
+    "HttpPort": 8080,
+    "HttpsPort": 443,
+    "TLSKeyLocation": "./devssl/server.key",
+    "TLSCertLocation": "./devssl/server.pem",
+    "DatabaseUser" : "sipac",
+    "DatabasePassword" : "1qaz2wsxsipac",
+    "DatabaseName" : "folha",
+    "DatabaseHost" : "10.30.0.10",
+    "DatabasePort" : 5432
+
+}
