@@ -46,18 +46,18 @@ def load_defaultconfiguration():
     server_config["HttpsPort"]=8443
     server_config["TLSKeyLocation"]=""
     server_config["TLSCertLocation"]=""
-    server_config["DatabaseUser"]="sipac"
-    server_config["DatabasePassword"]="1qaz2wsxsipac"
-    server_config["DatabaseName"]="folha"
-    server_config["DatabaseHost"]="10.30.0.10"
+    server_config["DatabaseUser"]="postgres"
+    server_config["DatabasePassword"]="database"
+    server_config["DatabaseName"]="db"
+    server_config["DatabaseHost"]="localhost"
     server_config["DatabasePort"]=5432
     return server_config
 
 # ROUTES
 app = Flask(__name__)   #
 
-@app.route('/api/get/<int:id>/', methods=['GET'])                #route registering
-@cross_origin(origins =['*'], methods=['GET', 'HEAD', 'OPTIONS'])                           #CORS configuration
+@app.route('/api/get/<int:id>/', methods=['GET'])                   #route registering
+@cross_origin(origins =['*'], methods=['GET', 'HEAD', 'OPTIONS'])   #CORS configuration
 def get_request(id):
     '''
     get_request route calls controllers.controller.get_request as its logic, with the list of validators
