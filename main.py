@@ -2,27 +2,13 @@ from flask import Flask, request
 from flask_cors import cross_origin
 from meinheld import server
 import controllers.controller as controller
+import validators.validators as validators
 import argparse
 import logging
 import json
 import os
 import db.connection as connection
 
-# Validation functions are sent as First Class Citizen Functions to the routes
-def validate_suported_mime_type():
-    '''
-    validate_suported_mime_type checks if media type header is application/json
-    '''
-    if 'Accept' in request.headers:
-        test = ['*/*', 'application/json']
-        hds = []
-        hds = request.headers['Accept'].split(",")
-        for hd in hds:
-            if hd in test:
-                return True
-        return "Unsupported Media Type", 415
-    else:
-        return "Unsupported Media Type", 415
 
 def load_configuration(config_file):
     '''
@@ -62,7 +48,7 @@ def get_request(id):
     '''
     get_request route calls controllers.controller.get_request as its logic, with the list of validators
     '''
-    return controller.get_request(id, [validate_suported_mime_type])
+    return controller.get_request(id, [validators.validate_suported_mime_type]) # data validation function are parsed as a list
 
 # Server Setup
 if __name__ == '__main__':

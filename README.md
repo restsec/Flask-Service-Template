@@ -9,6 +9,10 @@ Folder Structure
     │   └── controller.py - - - ├──> Route internal logic,
     |                           └──> Framework Independent
     |
+    ├── validators
+    |   ├── __init__.py
+    |   └── validators.py - - - ───> Framework/Buisiness related validations
+    |
     ├── services
     |   ├── __init__.py
     |   └── services.py - - - - ───> External services usage (client)
