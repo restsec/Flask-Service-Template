@@ -9,41 +9,51 @@ import time, datetime
 import logging
 import hashlib
 import decimal
+import psycopg2
+
 from db.connection import PostgresDbHelper
 import services.services as serv
 
 
-SQL_STMT_REF_BY_CARG_VIG = """
-        	SELECT pc.id_plano_carreira, cp.de_classe, cp.de_nivel_padrao, s.vr_subsidio
-		        FROM folha.foltb006_subsidio s
-	        INNER JOIN folha.foltb004_plano_carreira pc
-		        on s.id_plano_carreira = pc.id_plano_carreira
-	        INNER JOIN folha.foltb003_classe_x_padrao cp
-		        on pc.id_classe_x_padrao = cp.id_classe_x_padrao
-	        WHERE pc.id_cargo = {} and s.id_vigencia = {}
-	        ORDER BY cp.de_classe, cp.de_nivel_padrao
+SQL_STMT_ONE_ENTITY = """
+            SQL FROM DATABASE
+            """
+SQL_STMT_INSERT = """
+            SQL TO INSERT
             """
             
-# get all remuneracao from database, using the PostgresDbHelper object
-def get_remuneracao_vigente(conn, id_cargo, vigencia):
-    # Convert query to row arrays
-    d = {}
-    d = collections.OrderedDict()
-    cargo = {}
-    cargo['id'] = id_cargo
-    d['cargo'] = cargo
-    d['vigencia'] = vigencia
-    refs = []
-    rows_ref = conn.retrieve(SQL_STMT_REF_BY_CARG_VIG.format(id_cargo, vigencia['id']))
-    for row_ref in rows_ref:
-        ref = collections.OrderedDict()
-        ref['id'] = row_ref[0]
-        ref['classe'] = row_ref[1]
-        ref['padrao'] = row_ref[2]
-        vlr = decimal.Decimal(row_ref[3])
-        ref['valor'] = str(vlr)
-        refs.append(ref)
-    d['valores'] = refs
-    d['uri'] = "/cargo/{}".format(id_cargo)
-    return d
+# get single entity from database, using the PostgresDbHelper object
+def get_one(codigo, conn):
+    try:
+        rows = conn.retrieve(SQL_STMT_ONE_ENTITY.format(codigo))
+    except psycopg2.DatabaseError as error:
+        logging.exception(error)
+        logging.exception("Exception while trying to execute statment: {}".format(SQL_STMT_ONE_ENTITY))
+        raise 
+        
+    if not rows:
+        return None
+
+    objects_list = []
+
+    for row in rows:
+        d = collections.OrderedDict()
+        d['codigo'] = row[0]
+        d['descricao'] = row[1]
+        d['uri'] = 'api/nome-api/{}'.format(row[0])
+        objects_list.append(d)
+
+    return objects_list
+
+# insert into rubrica, using the PostgresDbHelper object
+def insert(new_object, conn):
+    parsed_sql = SQL_STMT_INSERT.format(new_object['codigo'], new_object['descricao'])
+    try:
+        if conn.persist(parsed_sql):
+            return True
+    except psycopg2.DatabaseError as error:
+        logging.exception(error)
+        logging.exception("Exception while trying to execute statement: {}".format(parsed_sql))
+        raise 
+
 
