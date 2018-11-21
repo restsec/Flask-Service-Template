@@ -1,18 +1,12 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Jan 19 09:46:12 2018
-
-"""
-
 import collections
-import time, datetime
 import logging
-import hashlib
-import decimal
 import psycopg2
-
-from db.connection import PostgresDbHelper
-import services.services as serv
+# import time, datetime
+# import hashlib
+# import decimal
+#
+# from db.connection import PostgresDbHelper
+# import services.services as serv
 
 
 SQL_STMT_ONE_ENTITY = """
@@ -21,7 +15,8 @@ SQL_STMT_ONE_ENTITY = """
 SQL_STMT_INSERT = """
             SQL TO INSERT
             """
-            
+
+
 # get single entity from database, using the PostgresDbHelper object
 def get_one(codigo, conn):
     try:
@@ -44,6 +39,7 @@ def get_one(codigo, conn):
         objects_list.append(d)
 
     return objects_list
+
 
 # insert into rubrica, using the PostgresDbHelper object
 def insert(new_object, conn):

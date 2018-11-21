@@ -1,5 +1,6 @@
 Flask==0.12.2
 flask_cors
 psycopg2==2.7.3.2
-meinheld
+pymongo==3.7.2
+meinheld==0.6.1
 requests[security]==2.20.0
