@@ -6,6 +6,7 @@ Created on Mon Dec 18 12:15:29 2017
 
 import psycopg2
 import logging
+import json
 from pymongo import MongoClient
 from pymongo.errors import ConfigurationError
 
@@ -94,18 +95,85 @@ class MongoDBHelper(object):
 
             self._db = MongoClient(mongodb_uri)
 
-    def persist(self, data, table):
+    def default_database(self):
         try:
-            db = self._db.get_default_database()
+            default = self._db.get_database()
         except ConfigurationError as e:
             logger.error(str(e))
         else:
-            collection = db.get_collection(table)
+            return default
+
+    def persist(self, data, table):
+        try:
+            db = self.default_database()
+            if type(data) is str:
+                data = json.loads(data)
+            elif type(data) is dict:
+                pass
+            else:
+                raise Exception("Unknow data type: {}".format(
+                    type(data)
+                ))
+        except ConfigurationError as e:
+            logger.error(str(e))
+        except ValueError as e:
+            logger.error(str(e))
+        except Exception as e:
+            logger.error(str(e))
+        else:
+            collection = db[table]
             result = collection.insert_many(data)
-            logger.info('Object inserted: {}'.format(
+            logger.info('Object(s) inserted: {}'.format(
                 str(result)
             ))
-        return result
+            return result
+        return None
+
+    def search(self, query, table):
+        try:
+            db = self.default_database()
+            if type(query) is str:
+                query = json.loads(query)
+            elif type(query) is dict:
+                pass
+            else:
+                raise Exception("Unknow data type: {}".format(
+                    type(query)
+                ))
+        except ConfigurationError as e:
+            logger.error(str(e))
+        except ValueError as e:
+            logger.error(str(e))
+        except Exception as e:
+            logger.error(str(e))
+        else:
+            collection = db.get_collection(table)
+            result = collection.find(query)
+            if result:
+                logger.info('Object(s) found: {}'.format(
+                    str(result)
+                ))
+                return result
+            else:
+                logger.info('Object(s) not found for query: {}'.format(
+                    str(query)
+                ))
+                return None
+
+    def delete(self):
+        pass
+
+    def close(self):
+        self._db.close()
+
+    def is_database_locked(self):
+        return self._db.is_locked
+
+    def is_connection_alive(self):
+        if self._db is None:
+            return False
+        else:
+            return True
 
 
 def configurar(parametros):
@@ -118,4 +186,3 @@ def configurar(parametros):
     )
     if Connection is None:
         logging.fatal("Error connecting to Database")
-
