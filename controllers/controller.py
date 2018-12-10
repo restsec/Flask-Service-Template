@@ -10,7 +10,7 @@ import services.services as serv
 # stores all database configuration
 database_config = {}
 
-# web service API remuneracao
+# web service API
 
 def get_one(codigo, validators, config):
     """
@@ -110,7 +110,7 @@ def is_connection_alive(server_config):
 #Função para testar se entidade externa (pertence a outra api) existe
 def exist(codigo):
     try:
-        m, cod = serv.get_by_id(codigo)
+        m, cod = serv.request_and_retry(__get_code, [codigo])
         if cod == 200:
             return True
         else:
