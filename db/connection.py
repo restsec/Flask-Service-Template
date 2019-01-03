@@ -85,13 +85,18 @@ class MongoDBHelper(object):
                 not database_password:
             raise Exception("There is no database configuration.")
         else:
-            mongodb_uri = 'mongodb://{}:{}@{}/{}'
-            mongodb_uri.format(
-                database_user,
-                database_password,
-                database_host,
-                database_name
-            )
+            mongodb_uri = 'mongodb://'
+            if database_user and database_password:
+                mongodb_uri += '{}:{}@{}'.format(
+                    database_name,
+                    database_password,
+                    database_host
+                )
+            else:
+                mongodb_uri += database_host
+            
+            if database_name:
+                mongodb_uri += '/{}'.format(database_name)
 
             self._db = MongoClient(mongodb_uri)
 
