@@ -1,18 +1,17 @@
-FROM python:3
-
-#COPY requirements.txt /app/requirements.txt
-COPY ./ /app/
+FROM python:3-alpine
 
 WORKDIR /app
 
-RUN pip3 install --proxy='https://10.30.0.10:3128' --no-cache-dir -r requirements.txt
+RUN apk add --no-cache gcc libffi-dev musl-dev openssl-dev make
 
-ADD . /app
+COPY requirements.txt /app/requirements.txt
+
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+COPY ./src/ /app/
 
 #ADD ./devssl ./devssl
 
-COPY conf.json conf.json
+EXPOSE 80 443
 
-EXPOSE 8080
-
-ENTRYPOINT ["/bin/bash", "run.sh"]
+CMD python3 main.py
