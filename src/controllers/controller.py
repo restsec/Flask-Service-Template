@@ -12,17 +12,11 @@ database_config = {}
 
 # web service API
 
-def get_one(codigo, validators, config):
+def get_one(codigo, config):
     """
     routes_with_codigo_request
    /api/nome-api/{codigo} methods=['GET']
     """
-    #Validation
-    for validation in validators:
-        result = validation()
-        if result != True:
-            return result
-
     if not is_connection_alive(config):
         return "Not able to reconnect with database", 500    
      
@@ -40,17 +34,11 @@ def get_one(codigo, validators, config):
     return json.dumps(dados), cod, {'Content-Type': 'application/json; charset=utf-8'} 
         
 
-def post_request(new_objeto, validators, config): 
+def post_request(new_objeto, config): 
     """
     post_request
     /api/rubrica/ methods=['PUT']
     """ 
-    #Validation
-    for validation in validators:
-        result = validation()
-        if result != True:
-            return result
-
     if not is_connection_alive(config):
         return "Not able to reconnect with database", 500
 

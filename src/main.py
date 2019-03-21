@@ -1,6 +1,6 @@
-from flask import Flask, request
-from flask_cors import cross_origin
-from meinheld import server
+from sanic import Sanic
+from sanic_cors import CORS
+from sanic import response
 import argparse
 import logging
 import json
@@ -11,6 +11,8 @@ import controllers.controller as controller
 import validators.validators as validators
 
 server_config = {}
+
+WORKERS = os.environ.get('WORKERS') or "8"
 
 def load_configuration(server_config):
     """
@@ -41,36 +43,40 @@ def load_configuration(server_config):
 
 def print_api_endpoints():
     """Imprime no log todos os endpoints disponibilizados por esta API."""
-    logging.info(f"Endpoints do serviço CADASTRO:")
-    for rule in app.url_map.iter_rules():
-        for method in rule.methods:
+    logging.info(f"Endpoints do serviço Data Query Proxy:")
+    for handler, (rule, router) in app.router.routes_names.items():
+        for method in router.methods:
             if method not in ['OPTIONS', 'HEAD']:
                 logging.info(f"- {method:6s} {rule}")
 
 
 # ROUTES
-app = Flask(__name__)   #
+app = Sanic(__name__)
+cors = CORS(app, automatic_options=True)
 
-@app.route('/api/get/<int:id>/', methods=['POST'])                   #route registering
-@cross_origin(origins =['*'], methods=['POST', 'HEAD', 'OPTIONS'])   #CORS configuration
-def post_request(id):
+
+@app.route('/api/get/<int:id>/', methods=['POST', 'OPTIONS'])                   #route registering
+def post_request(request, id):
     '''
     get_request route calls controllers.controller.get_request as its logic, with the list of validators
     '''
-    return controller.post_request(request.json, [validators.validate_suported_mime_type], server_config) # data validation function are parsed as a list
+    resp, cod = controller.post_request(request.json, server_config)
+    return response.text(resp, status=cod) 
 
 
-@app.route('/api/get/<int:id>/', methods=['GET', 'PUT'])                   #route registering
-@cross_origin(origins =['*'], methods=['GET', 'PUT', 'HEAD', 'OPTIONS'])   #CORS configuration
-def get_one_or_put(id):
+@app.route('/api/get/<int:id>/', methods=['GET', 'PUT', 'OPTIONS'])                   #route registering
+def get_one_or_put(request, id):
     '''
     get_request route calls controllers.controller.get_request as its logic, with the list of validators
     '''
     if request.method == 'GET':
-        return controller.get_one(id, [validators.validate_suported_mime_type], server_config) # data validation function are parsed as a list
+        resp, cod = controller.get_one(id, server_config)
+        return response.text(resp, status=cod) 
+
 
     elif request.method == 'PUT':
-        return controller.get_one(id, [validators.validate_suported_mime_type], server_config) # data validation function are parsed as a list
+        resp, cod = controller.get_one(id, server_config) 
+        return response.text(resp, status=cod) 
 
 # Server Setup
 if __name__ == '__main__':
@@ -90,5 +96,4 @@ if __name__ == '__main__':
 
     logging.info("Serviço função inicializado e pronto para uso!")
 
-    server.listen(('0.0.0.0', server_config['HttpPort']))
-    server.run(app)
+    app.run(host='0.0.0.0', port=int(server_config['HttpPort']), workers=int(WORKERS))

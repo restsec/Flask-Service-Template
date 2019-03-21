@@ -1,6 +1,5 @@
-Flask
-flask_cors
-psycopg2==2.7.3.2
-pymongo==3.7.2
-meinheld==0.6.1
-requests[security]==2.20.0
+sanic
+sanic-cors
+psycopg2
+pymongo
+requests[security]
