@@ -1,4 +1,4 @@
-# Flask Service Template
+# Python Microservice Service Template
 
 Folder Structure
 
