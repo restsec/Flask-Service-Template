@@ -56,7 +56,7 @@ cors = CORS(app, automatic_options=True)
 
 
 @app.route('/api/get/<int:id>/', methods=['POST', 'OPTIONS'])                   #route registering
-def post_request(request, id):
+async def post_request(request, id):
     '''
     get_request route calls controllers.controller.get_request as its logic, with the list of validators
     '''
@@ -65,7 +65,7 @@ def post_request(request, id):
 
 
 @app.route('/api/get/<int:id>/', methods=['GET', 'PUT', 'OPTIONS'])                   #route registering
-def get_one_or_put(request, id):
+async def get_one_or_put(request, id):
     '''
     get_request route calls controllers.controller.get_request as its logic, with the list of validators
     '''
